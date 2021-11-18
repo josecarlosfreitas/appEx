@@ -1,0 +1,1 @@
+export const cloudAddress = 'https://app-ex-jc.herokuapp.com/';
