@@ -1,26 +1,20 @@
 
 import React, { useState } from 'react';
-import { Keyboard, StyleSheet } from 'react-native';
+import { Keyboard } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { Container, InputArea, CustomButton, CustomButtonText, LoadingIcon } from './style';
 import SignInput from '../../../components/SignInput';
 
 import { useNavigation } from '@react-navigation/native';
 import { cloudAddress } from '../../../Api'
+import { ToastTypeError, ToastTypeInfo } from '../../../enum/ToastTypeEnum';
 
 export default () => {
-    const [emailField, setEmailField] = useState('');
-    const [passwordField, setPasswordField] = useState('');
+    const [usuarioField, setUsuarioField] = useState('');
+    const [senhaField, setSenhaField] = useState('');
     const [visibilityLoad, setVisibilityLoad] = useState(false);
 
     const navigation = useNavigation();
-
-    const styles = StyleSheet.create({
-        imgLogo: {
-          width: 330,
-          height: 80,
-        }
-    });
 
     const validarSenha = async () => {
         try {
@@ -32,8 +26,8 @@ export default () => {
             myHeaders.append("Content-Type", "application/json");
             
             var usuario = JSON.stringify({
-                "nome": emailField,
-                "senha": passwordField,
+                "nome": usuarioField,
+                "senha": senhaField,
             });
 
             var requestOptions = {
@@ -70,7 +64,6 @@ export default () => {
         setVisibilityLoad(false);
     };
 
-    // Rough implementation. Untested.
     function timeout(ms, promise) {
         return new Promise(function (resolve, reject) {
             setTimeout(function () {
@@ -81,23 +74,22 @@ export default () => {
     }
 
     const handleClick = async () => {
-        if (emailField != '' && passwordField != '') {
-            //let ret = await Api.signin(emailField, passwordField);
-            if (emailField.length > 0 && passwordField.length > 0) {
+        if (usuarioField != '' && senhaField != '') {
+            if (usuarioField.length > 0 && senhaField.length > 0) {
                 validarSenha();
             }
             else {
-                /*Toast.show({
-                    type: 'error',
+                Toast.show({
+                    type: ToastTypeError,
                     visibilityTime: 3000,
-                    text1: 'Falha',
-                    text2: 'Usuário e senha invalidos...'
-                });*/
+                    text1: 'Erro',
+                    text2: 'Usuario e senha invalidos...'
+                });
             }
         }
         else {
             Toast.show({
-                type: 'info',
+                type: ToastTypeInfo,
                 visibilityTime: 3000,
                 text1: 'Atenção',
                 text2: 'Preencha os campos para continuar...'
@@ -108,11 +100,11 @@ export default () => {
     return (
         <Container>
             <InputArea>
-                <SignInput placeholder="E-mail" value={emailField}
-                    onChangeText={t => setEmailField(t)} />
-                <SignInput placeholder="Senha" value={passwordField}
-                    onChangeText={t => setPasswordField(t)} secure={true} />
-                { visibilityLoad == true ?  <LoadingIcon size="large" color="#022162" /> : null}
+                <SignInput placeholder="Usuario" value={usuarioField}
+                    onChangeText={t => setUsuarioField(t)} />
+                <SignInput placeholder="Senha" value={senhaField}
+                    onChangeText={t => setSenhaField(t)} secure={true} />
+                { visibilityLoad  ?  <LoadingIcon size="large" color="#022162" /> : null}
                 <CustomButton onPress={handleClick}>
                     <CustomButtonText>LOGIN</CustomButtonText>
                 </CustomButton>
