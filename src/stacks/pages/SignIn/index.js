@@ -40,9 +40,10 @@ export default () => {
             await timeout(10000, fetch(cloudAddress + "usuario/validarsenha", requestOptions))
                 .then(response => response.text())
                 .then(result => {
-                    console.log('Criado!!' + result);
+                    console.log(result);
                     if(result && result == "true"){
                         console.log('usuario valido');
+                        navigation.navigate("BottomNavigator");
                         /*navigation.navigate('MainTab', { 
                         msg: {
                             type: ToastTypeSuccess,
