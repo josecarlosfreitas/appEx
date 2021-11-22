@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dimensions,
   Image,
@@ -16,15 +16,22 @@ import {
 } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import COLORS from "../../constants/colors";
-import categories from "../../constants/categories";
 import foods from "../../constants/foods";
+import { cloudAddress } from '../../Api'
+import getImageByKey from "../../../assets/catergories";
+
 
 const { width } = Dimensions.get("screen");
 const cardWidth = width / 2 - 20;
 
 const HomeScreen = ({ navigation }) => {
   const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(0);
+  const [categorias, setCategorias] = useState([]);
 
+  useEffect(() => {
+    getCategorias();
+  }, [])
+  
   const ListCategories = () => {
     return (
       <ScrollView
@@ -32,7 +39,7 @@ const HomeScreen = ({ navigation }) => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={style.categoriesListContainer}
       >
-        {categories.map((category, index) => (
+        {categorias.map((category, index) => (
           <TouchableOpacity
             key={index}
             activeOpacity={0.8}
@@ -49,7 +56,7 @@ const HomeScreen = ({ navigation }) => {
             >
               <View style={style.categoryBtnImgCon}>
                 <Image
-                  source={category.image}
+                  source={getImageByKey(category.imagem)}
                   style={{ height: 35, width: 35, resizeMode: "cover" }}
                 />
               </View>
@@ -64,7 +71,7 @@ const HomeScreen = ({ navigation }) => {
                       : COLORS.primary,
                 }}
               >
-                {category.name}
+                {category.nome}
               </Text>
             </View>
           </TouchableOpacity>
@@ -111,6 +118,22 @@ const HomeScreen = ({ navigation }) => {
       </TouchableHighlight>
     );
   };
+
+  const getCategorias = async() => {
+    var requestOptions = {
+      method: 'GET',
+      redirect: 'follow',
+      timeout: 5000
+    };
+  
+    await fetch(cloudAddress + 'categoria', requestOptions)
+    .then(response => response.text())
+    .then(result => {
+      var listaCategorias = JSON.parse(result);
+      setCategorias(listaCategorias);
+      console.log(categorias);
+    })
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -194,12 +217,12 @@ const style = StyleSheet.create({
   },
   categoryBtn: {
     height: 45,
-    width: 120,
     marginRight: 7,
     borderRadius: 30,
     alignItems: "center",
     paddingHorizontal: 5,
     flexDirection: "row",
+    paddingRight: 18
   },
   categoryBtnImgCon: {
     height: 35,

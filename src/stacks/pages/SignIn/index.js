@@ -44,13 +44,6 @@ export default () => {
                     if(result && result == "true"){
                         console.log('usuario valido');
                         navigation.navigate("BottomNavigator");
-                        /*navigation.navigate('MainTab', { 
-                        msg: {
-                            type: ToastTypeSuccess,
-                            text1: 'Sucesso!',
-                            text2: 'Atendimento criado com sucesso.'
-                        }
-                        });*/
                     }else{
                         console.log('usuario nao valido');
                     }
