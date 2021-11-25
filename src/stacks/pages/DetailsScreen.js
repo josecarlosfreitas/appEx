@@ -4,15 +4,16 @@ import { ScrollView } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import COLORS from "../../constants/colors";
 import { SecondaryButton } from "../../components/Button";
+import getImageItemByKey from "../../../assets/items";
 
 const DetailsScreen = ({ navigation, route }) => {
   const item = route.params;
 
   return (
-    <SafeAreaView style={{ backgroundColor: COLORS.white }}>
+    <SafeAreaView style={{ backgroundColor: COLORS.white, paddingTop:20 }}>
       <View style={style.header}>
         <Icon name="arrow-back-ios" size={28} onPress={navigation.goBack} />
-        <Text style={{ fontSize: 20, fontWeight: "bold" }}>Details</Text>
+        <Text style={{ fontSize: 20, fontWeight: "bold" }} onPress={navigation.goBack}>Voltar</Text>
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View
@@ -22,7 +23,7 @@ const DetailsScreen = ({ navigation, route }) => {
             height: 280,
           }}
         >
-          <Image source={item.image} style={{ height: 220, width: 220 }} />
+          <Image source={getImageItemByKey(item.imagem)} style={{ height: 220, width: 220 }} />
         </View>
         <View style={style.details}>
           <View
@@ -35,21 +36,17 @@ const DetailsScreen = ({ navigation, route }) => {
             <Text
               style={{ fontSize: 25, fontWeight: "bold", color: COLORS.white }}
             >
-              {item.name}
+              {item.nome}
             </Text>
             <View style={style.iconContainer}>
               <Icon name="favorite-border" color={COLORS.primary} size={25} />
             </View>
           </View>
           <Text style={style.detailsText}>
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever since the 1500s, when an unknown printer took a galley of type
-            and scrambled it to make a type specimen book. It has survived not
-            only five centuries.
+            {item.ingredientes}
           </Text>
           <View style={{ marginTop: 40, marginBottom: 40 }}>
-            <SecondaryButton title="Add To Cart" />
+            <SecondaryButton title="Adicionar ao Pedido" />
           </View>
         </View>
       </ScrollView>

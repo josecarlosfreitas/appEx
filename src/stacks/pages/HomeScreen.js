@@ -16,21 +16,53 @@ import {
 } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import COLORS from "../../constants/colors";
-import foods from "../../constants/foods";
 import { cloudAddress } from '../../Api'
 import getImageByKey from "../../../assets/catergories";
-
+import getImageItemByKey from "../../../assets/items";
+import truncate from "../../utils/truncate";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import capitalizeFirstLetter from "../../utils/capitalize";
 
 const { width } = Dimensions.get("screen");
 const cardWidth = width / 2 - 20;
 
 const HomeScreen = ({ navigation }) => {
-  const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(0);
+  const [selectedCategoryIndex, setSelectedCategoryIndex] = useState();
   const [categorias, setCategorias] = useState([]);
+  const [items, setItems] = useState([]);
+  const [itemsAux, setItemsAux] = useState([]);
+  const [nomeUsuario, setNomeUsuario] = useState('');
 
   useEffect(() => {
     getCategorias();
+    getItems();
+    getUsuario();
   }, [])
+
+  const getUsuario = async() => {
+    const usuario = await AsyncStorage.getItem('nome');
+    setNomeUsuario(usuario);
+  }
+
+  const selecionarCategoria = async(categoria, index) => {
+    if(index == selectedCategoryIndex){
+      setSelectedCategoryIndex();
+      setItems(itemsAux);
+    }else{
+      setSelectedCategoryIndex(index)
+      if(index >= 0){
+        const categoria = categorias[index];
+        const lista = [];
+        itemsAux.forEach((item) => {
+          if(item.categoria == categoria.nome){
+            lista.push(item);
+          }
+        });
+          
+        setItems(lista);
+      }
+    }
+  }
   
   const ListCategories = () => {
     return (
@@ -43,7 +75,7 @@ const HomeScreen = ({ navigation }) => {
           <TouchableOpacity
             key={index}
             activeOpacity={0.8}
-            onPress={() => setSelectedCategoryIndex(index)}
+            onPress={() => selecionarCategoria(category, index)}
           >
             <View
               style={{
@@ -89,26 +121,26 @@ const HomeScreen = ({ navigation }) => {
       >
         <View style={style.card}>
           <View style={{ alignItems: "center", top: -40 }}>
-            <Image source={food.image} style={{ height: 120, width: 120 }} />
+            <Image source={getImageItemByKey(food.imagem)} style={{ height: 120, width: 120 }} />
           </View>
-          <View style={{ marginHorizontal: 20 }}>
-            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-              {food.name}
+          <View style={{ marginHorizontal: 20, top: -30 }}>
+            <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+              {food.nome}
             </Text>
-            <Text style={{ fontSize: 14, color: COLORS.grey, marginTop: 2 }}>
-              {food.ingredients}
+            <Text style={{ fontSize: 13, color: COLORS.grey, marginTop: 2 }}>
+              {truncate(food.ingredientes, 40)}
             </Text>
           </View>
           <View
             style={{
-              marginTop: 10,
+              marginTop: -8,
               marginHorizontal: 20,
               flexDirection: "row",
               justifyContent: "space-between",
             }}
           >
             <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-              ${food.price}
+              R$ {food.preco}
             </Text>
             <View style={style.addToCartBtn}>
               <Icon name="add" size={20} color={COLORS.white} />
@@ -135,19 +167,32 @@ const HomeScreen = ({ navigation }) => {
     })
   }
 
+  const getItems = async() => {
+    var requestOptions = {
+      method: 'GET',
+      redirect: 'follow',
+      timeout: 5000
+    };
+  
+    await fetch(cloudAddress + 'item', requestOptions)
+    .then(response => response.text())
+    .then(result => {
+      var listaItems = JSON.parse(result);
+      setItems(listaItems);
+      setItemsAux(listaItems);
+    })
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
       <View style={style.header}>
         <View>
           <View style={{ flexDirection: "row" }}>
-            <Text style={{ fontSize: 28 }}>Hello,</Text>
+            <Text style={{ fontSize: 28 }}>Olá,</Text>
             <Text style={{ fontSize: 28, fontWeight: "bold", marginLeft: 10 }}>
-              Ashwin
+              {capitalizeFirstLetter(nomeUsuario)}
             </Text>
           </View>
-          <Text style={{ marginTop: 5, fontSize: 22, color: COLORS.grey }}>
-            What do you want today
-          </Text>
         </View>
         <Image
           source={require("../../../assets/person.png")}
@@ -156,7 +201,7 @@ const HomeScreen = ({ navigation }) => {
       </View>
       <View
         style={{
-          marginTop: 40,
+          marginTop: 20,
           flexDirection: "row",
           paddingHorizontal: 20,
         }}
@@ -165,7 +210,7 @@ const HomeScreen = ({ navigation }) => {
           <Icon name="search" size={28} />
           <TextInput
             style={{ flex: 1, fontSize: 18 }}
-            placeholder="Search for food"
+            placeholder="Pesquisar"
           />
         </View>
         <View style={style.sortBtn}>
@@ -178,7 +223,7 @@ const HomeScreen = ({ navigation }) => {
       <FlatList
         showsVerticalScrollIndicator={false}
         numColumns={2}
-        data={foods}
+        data={items}
         renderItem={({ item }) => <Card food={item} />}
       />
     </SafeAreaView>
