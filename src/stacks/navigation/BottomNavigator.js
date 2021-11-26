@@ -1,15 +1,29 @@
 import "react-native-gesture-handler";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import COLORS from "../../constants/colors";
 import { View } from "react-native";
 import HomeScreen from "../pages/HomeScreen";
 import CartScreen from "../pages/CartScreen";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Tab = createBottomTabNavigator();
 
 const BottomNavigator = () => {
+  const [count, setCount] = useState();
+
+  useEffect(() => {
+    AsyncStorage.getItem("items")
+      .then(req => JSON.parse(req))
+      .then(json => {
+        if(json){
+          setCount(json.length);
+        }
+      })
+      .catch(error => console.log('error!'));
+  }, [])
+
   return (
     <Tab.Navigator
       tabBarOptions={{
@@ -80,6 +94,7 @@ const BottomNavigator = () => {
           tabBarIcon: ({ color }) => (
             <Icon name="shopping-cart" color={color} size={28} />
           ),
+          tabBarBadge: count
         }}
       />
     </Tab.Navigator>

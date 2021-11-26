@@ -1,16 +1,18 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView, StyleSheet, View, Text, Image } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import COLORS from "../../constants/colors";
-import foods from "../../constants/foods";
 import { PrimaryButton } from "../../components/Button";
+import getImageItemByKey from "../../../assets/items";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import truncate from "../../utils/truncate";
 
 const CartScreen = ({ navigation }) => {
   const CartCard = ({ item }) => {
     return (
       <View style={style.cartCard}>
-        <Image source={item.image} style={{ height: 80, width: 80 }} />
+        <Image source={getImageItemByKey(item.imagem)} style={{ height: 80, width: 80 }} />
         <View
           style={{
             height: 100,
@@ -19,34 +21,62 @@ const CartScreen = ({ navigation }) => {
             flex: 1,
           }}
         >
-          <Text style={{ fontWeight: "bold", fontSize: 16 }}>{item.name}</Text>
+          <Text style={{ fontWeight: "bold", fontSize: 16 }}>{item.nome}</Text>
           <Text style={{ fontSize: 13, color: COLORS.grey }}>
-            {item.ingredients}
+            {truncate(item.ingredientes, 25)}
           </Text>
           <Text style={{ fontSize: 17, fontWeight: "bold" }}>
-            ${item.price}
+            R${item.preco}
           </Text>
         </View>
-        <View style={{ marginRight: 20, alignItems: "center" }}>
+        <View style={{ marginRight: 10, alignItems: "center" }}>
           <Text style={{ fontWeight: "bold", fontSize: 18 }}>3</Text>
           <View style={style.actionBtn}>
-            <Icon name="remove" size={25} color={COLORS.white} />
-            <Icon name="add" size={25} color={COLORS.white} />
+            <Icon name="remove" size={25} color={COLORS.white} onPress={() => removerItem(item)} />
+            <Icon name="add" size={25} color={COLORS.white} onPress={() => adicionarItem(item)} />
           </View>
         </View>
       </View>
     );
   };
+
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    getItemsPedido();
+  }, [])
+
+  const getItemsPedido = async() => {
+    AsyncStorage.getItem("items")
+      .then(req => JSON.parse(req))
+      .then(json => {
+        if(json){
+          setItems(json);
+        }
+      })
+      .catch(error => console.log('error!'));
+  }
+
+  const adicionarItem = async(item) => {
+    console.log(item);
+    console.log('add');
+  }
+
+  const removerItem = async(item) => {
+    console.log(item);
+    console.log('remover');
+  }
+
   return (
     <SafeAreaView style={{ backgroundColor: COLORS.white, flex: 1 }}>
       <View style={style.header}>
         <Icon name="arrow-back-ios" size={28} onPress={navigation.goBack} />
-        <Text style={{ fontSize: 20, fontWeight: "bold" }}>Cart</Text>
+        <Text style={{ fontSize: 20, fontWeight: "bold" }}>Pedido</Text>
       </View>
       <FlatList
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 80 }}
-        data={foods}
+        data={items}
         renderItem={({ item }) => <CartCard item={item} />}
         ListFooterComponentStyle={{ paddingHorizontal: 20, marginTop: 20 }}
         ListFooterComponent={() => (
@@ -59,7 +89,7 @@ const CartScreen = ({ navigation }) => {
               }}
             >
               <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                Total Price
+                Total
               </Text>
               <Text style={{ fontSize: 18, fontWeight: "bold" }}>$50</Text>
             </View>

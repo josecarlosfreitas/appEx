@@ -5,9 +5,31 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import COLORS from "../../constants/colors";
 import { SecondaryButton } from "../../components/Button";
 import getImageItemByKey from "../../../assets/items";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const DetailsScreen = ({ navigation, route }) => {
   const item = route.params;
+
+  const adicionarAoPedido = (food) => {
+    AsyncStorage.getItem("items")
+      .then(req => JSON.parse(req))
+      .then(json => {
+        if(json){
+          const arrFiltered = json.filter(i => i.id == food.id);
+          if(!arrFiltered.length){
+            json.push(food);
+          }
+          navigation.goBack();
+        }else{
+          const arr = [];
+          arr.push(food);
+          AsyncStorage.setItem('items', JSON.stringify(arr))
+            .then(json => navigation.goBack())
+            .catch(error => console.log('error!'));
+        }
+      })
+      .catch(error => console.log('error!'));
+  }
 
   return (
     <SafeAreaView style={{ backgroundColor: COLORS.white, paddingTop:20 }}>
@@ -46,7 +68,7 @@ const DetailsScreen = ({ navigation, route }) => {
             {item.ingredientes}
           </Text>
           <View style={{ marginTop: 40, marginBottom: 40 }}>
-            <SecondaryButton title="Adicionar ao Pedido" />
+            <SecondaryButton title="Adicionar ao Pedido" onPress={() => adicionarAoPedido(item)} />
           </View>
         </View>
       </ScrollView>
