@@ -37,6 +37,9 @@ const HomeScreen = ({ navigation }) => {
     getCategorias();
     getItems();
     getUsuario();
+    AsyncStorage.getItem('items')
+    .then(json => console.log(json));
+    
   }, [])
 
   const getUsuario = async() => {
@@ -163,7 +166,6 @@ const HomeScreen = ({ navigation }) => {
     .then(result => {
       var listaCategorias = JSON.parse(result);
       setCategorias(listaCategorias);
-      console.log(categorias);
     })
   }
 

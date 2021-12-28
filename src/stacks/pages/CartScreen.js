@@ -8,7 +8,7 @@ import getImageItemByKey from "../../../assets/items";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import truncate from "../../utils/truncate";
 
-const CartScreen = ({ navigation }) => {
+const CartScreen = ({ navigation, route }) => {
   const CartCard = ({ item }) => {
     return (
       <View style={style.cartCard}>
@@ -52,6 +52,7 @@ const CartScreen = ({ navigation }) => {
       .then(json => {
         if(json){
           setItems(json);
+          console.log(json);
         }
       })
       .catch(error => console.log('error!'));
@@ -65,6 +66,14 @@ const CartScreen = ({ navigation }) => {
   const removerItem = async(item) => {
     console.log(item);
     console.log('remover');
+  }
+
+  const checkout = async() => {
+
+    await AsyncStorage.removeItem("items")
+    
+    navigation.jumpTo("HomeScreen", []);
+    
   }
 
   return (
@@ -94,7 +103,7 @@ const CartScreen = ({ navigation }) => {
               <Text style={{ fontSize: 18, fontWeight: "bold" }}>$50</Text>
             </View>
             <View style={{ marginHorizontal: 30 }}>
-              <PrimaryButton title="CHECKOUT" />
+              <PrimaryButton title="CHECKOUT" onPress={checkout} />
             </View>
           </View>
         )}

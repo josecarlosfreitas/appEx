@@ -10,14 +10,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Tab = createBottomTabNavigator();
 
-const BottomNavigator = () => {
+const BottomNavigator = (navigation, params) => {
   const [count, setCount] = useState();
 
   useEffect(() => {
+    console.log("sss")
+    console.log(params)
     AsyncStorage.getItem("items")
-      .then(req => JSON.parse(req))
-      .then(json => {
-        if(json){
+      .then(req => {
+        console.log(req)
+        const json = JSON.parse(req)
+        if (req) {
           setCount(json.length);
         }
       })
@@ -26,14 +29,16 @@ const BottomNavigator = () => {
 
   return (
     <Tab.Navigator
-      tabBarOptions={{
-        style: {
-          height: 55,
-          borderTopWidth: 0,
-          elevation: 0,
-        },
-        showLabel: false,
-        activeTintColor: COLORS.primary,
+      screenOptions={{
+        tabBarActiveTintColor: COLORS.primary,
+        tabBarShowLabel: false,
+        tabBarStyle: [
+          {
+            height: 55,
+            borderTopWidth: 0,
+            elevation: 0,
+          }
+        ]
       }}
     >
       <Tab.Screen
